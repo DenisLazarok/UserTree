@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using MediatR;
+﻿using MediatR;
 using UserTree.Application.Specifications;
 using UserTree.Domain.Entities;
 using UserTree.Domain.Interfaces;
@@ -27,6 +26,7 @@ public class CreateNodeCommandHandler : IRequestHandler<CreateNodeCommand>
         if (parentNode!.ChildrenNodes.Any(x => x.Name == request.NodeName))
             throw new Exception($"Duplicate name");
 
-        parentNode.ChildrenNodes.Add(new TreeNode(request.NodeName));
+        parentNode.ChildrenNodes.Add(new TreeNode(request.NodeName, parentNode.Tree));
+        await _treeNodeRepository.SaveChangesAsync(cancellationToken);
     }
 }

@@ -1,5 +1,7 @@
-using UserTree.Domain.Interfaces;
-using UserTree.Infrastructure.Persistence.Base.GenericRepository;
+using Microsoft.EntityFrameworkCore;
+using UserTree.Application;
+using UserTree.Infrastructure;
+using UserTree.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,8 +11,24 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
+
+using (IServiceScope scope = app.Services.CreateScope())
+{
+    IServiceProvider scopedProvider = scope.ServiceProvider;
+    try
+    {
+        var context = scopedProvider.GetRequiredService<ApplicationDbContext>();
+        await context.Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogError(ex, "An error occurred seeding the DB.");
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -19,7 +37,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 app.UseHttpsRedirection();
 

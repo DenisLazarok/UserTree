@@ -21,7 +21,7 @@ public class DeleteNodeCommandHandler : IRequestHandler<DeleteNodeCommand>
 
     public async Task Handle(DeleteNodeCommand request, CancellationToken cancellationToken)
     {
-        var node = await _treeNodeRepository.GetByIdAsync(new GetTreeNodeSpecification(request.NodeId), cancellationToken);
+        var node = await _treeNodeRepository.FirstOrDefaultAsync(new GetTreeNodeSpecification(request.NodeId), cancellationToken);
         
         _treeNodeValidator.ValidateTreeNode(node, request.TreeName, request.NodeId);
         
@@ -30,12 +30,12 @@ public class DeleteNodeCommandHandler : IRequestHandler<DeleteNodeCommand>
         if(hasChildNodes)
             throw new Exception($"You have to delete all children nodes first");
 
+        await _treeNodeRepository.DeleteAsync(node!, cancellationToken);
+        
         if (node!.ParentNode is null)
         {
             await _treeRepository.DeleteAsync(node.Tree, cancellationToken);
         }
-
-        await _treeNodeRepository.DeleteAsync(node, cancellationToken);
         await _treeNodeRepository.SaveChangesAsync(cancellationToken);
     }
 }

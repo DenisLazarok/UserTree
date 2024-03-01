@@ -6,16 +6,24 @@ public sealed class TreeNode
     public string Name { get; set; }
     public int? ParentNodeId { get; set; }
     public TreeNode? ParentNode { get; set; }
-    public List<TreeNode> ChildrenNodes { get; set; }
+    public List<TreeNode> ChildrenNodes { get; set; } = new List<TreeNode>();
     public Tree Tree { get; set; }
-
-    public TreeNode(TreeNode? parentNode, string name)
+    
+#pragma warning disable CS8618
+    private TreeNode()
+    {
+        
+    }
+    
+    public TreeNode(TreeNode? parentNode, string name, Tree tree)
     {
         ParentNode = parentNode;
         Name = name;
+        Tree = tree;
     }
-    public TreeNode(string name)
+    public TreeNode(string name, Tree tree)
     {
         Name = name;
+        Tree = tree;
     }
 }

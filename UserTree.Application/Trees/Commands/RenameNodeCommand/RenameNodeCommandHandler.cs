@@ -19,11 +19,17 @@ public class RenameNodeCommandHandler : IRequestHandler<RenameNodeCommand>
     
     public async Task Handle(RenameNodeCommand request, CancellationToken cancellationToken)
     {
-        var node = await _treeNodeRepository.GetByIdAsync(new GetTreeNodeSpecification(request.NodeId), cancellationToken);
+        var node = await _treeNodeRepository.FirstOrDefaultAsync(new GetTreeNodeSpecification(request.NodeId), cancellationToken);
         _treeNodeValidator.ValidateTreeNode(node, request.TreeName, request.NodeId);
 
-        if (node!.ParentNode is null)
+        if (node!.ParentNodeId is null)
             throw new Exception($"Couldn't rename root node");
+
+        if (node.Name == request.NewNodeName)
+            return;
+        
+        if (node.ParentNode!.ChildrenNodes.Any(x => x.Name == request.NewNodeName))
+            throw new Exception($"Duplicate name");
         
         node.Name = request.NewNodeName;
         await _treeNodeRepository.SaveChangesAsync(cancellationToken);
