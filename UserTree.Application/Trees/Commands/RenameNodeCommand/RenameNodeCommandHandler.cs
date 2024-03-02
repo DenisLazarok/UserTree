@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using UserTree.Application.Specifications;
 using UserTree.Domain.Entities;
+using UserTree.Domain.Exceptions;
 using UserTree.Domain.Interfaces;
 using UserTree.Domain.Services;
 
@@ -23,13 +24,13 @@ public class RenameNodeCommandHandler : IRequestHandler<RenameNodeCommand>
         _treeNodeValidator.ValidateTreeNode(node, request.TreeName, request.NodeId);
 
         if (node!.ParentNodeId is null)
-            throw new Exception($"Couldn't rename root node");
+            throw new SecureException($"Couldn't rename root node");
 
         if (node.Name == request.NewNodeName)
             return;
         
         if (node.ParentNode!.ChildrenNodes.Any(x => x.Name == request.NewNodeName))
-            throw new Exception($"Duplicate name");
+            throw new SecureException($"Duplicate name");
         
         node.Name = request.NewNodeName;
         await _treeNodeRepository.SaveChangesAsync(cancellationToken);

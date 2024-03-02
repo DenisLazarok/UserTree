@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using UserTree.Api.Middlewares;
 using UserTree.Application;
 using UserTree.Infrastructure;
 using UserTree.Infrastructure.Persistence;
@@ -13,6 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices();
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
 var app = builder.Build();
 
@@ -37,6 +39,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseOwnExceptionHandler();
 
 app.UseHttpsRedirection();
 

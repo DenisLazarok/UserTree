@@ -23,7 +23,7 @@ public class UserTreeController : BaseController
     }
     
     [HttpPost(Name = "api.user.tree.node.create")]
-    public async Task<ActionResult> Create([FromQuery] CreateNodeCommand request)
+    public async Task<ActionResult> Create([FromBody] CreateNodeCommand request)
     {
         
         await _mediator.Send(request);

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using UserTree.Application.Specifications;
 using UserTree.Domain.Entities;
+using UserTree.Domain.Exceptions;
 using UserTree.Domain.Interfaces;
 using UserTree.Domain.Services;
 
@@ -28,7 +29,7 @@ public class DeleteNodeCommandHandler : IRequestHandler<DeleteNodeCommand>
         var hasChildNodes = await _treeNodeRepository.AnyAsync(new GetTreeNodeChildrenSpecification(request.NodeId), cancellationToken);
         
         if(hasChildNodes)
-            throw new Exception($"You have to delete all children nodes first");
+            throw new SecureException($"You have to delete all children nodes first");
 
         await _treeNodeRepository.DeleteAsync(node!, cancellationToken);
         

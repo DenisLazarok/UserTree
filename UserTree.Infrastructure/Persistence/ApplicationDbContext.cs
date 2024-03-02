@@ -14,7 +14,7 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<Tree> Trees { get; set; }
     public DbSet<TreeNode> TreeNodes { get; set; }
-
+    public DbSet<JournalEvent> JournalEvents { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
